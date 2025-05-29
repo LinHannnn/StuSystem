@@ -121,6 +121,18 @@ public class ScoreController {
         }
     }
 
+    @Operation(summary = "根据学生姓名获取成绩")
+    @GetMapping("/student/name/{studentName}")
+    public Result<List<ScoreDTO>> getScoresByStudentName(@PathVariable String studentName) {
+        try {
+            List<ScoreDTO> scores = scoreService.getScoresByStudentName(studentName);
+            return Result.success(scores);
+        } catch (Exception e) {
+            logger.error("获取学生成绩失败，学生姓名: " + studentName, e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
     @Operation(summary = "根据学期获取所有成绩")
     @GetMapping("/semester/{semester}")
     public Result<List<ScoreDTO>> getScoresBySemester(@PathVariable String semester) {
@@ -143,6 +155,20 @@ public class ScoreController {
             return Result.success(scores);
         } catch (Exception e) {
             logger.error("获取学生学期成绩失败，学生ID: " + studentId + ", 学期: " + semester, e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "根据学生姓名和学期获取成绩")
+    @GetMapping("/student/name/{studentName}/semester/{semester}")
+    public Result<List<ScoreDTO>> getScoresByStudentNameAndSemester(
+            @PathVariable String studentName, 
+            @PathVariable String semester) {
+        try {
+            List<ScoreDTO> scores = scoreService.getScoresByStudentNameAndSemester(studentName, semester);
+            return Result.success(scores);
+        } catch (Exception e) {
+            logger.error("获取学生学期成绩失败，学生姓名: " + studentName + ", 学期: " + semester, e);
             return Result.fail(e.getMessage());
         }
     }

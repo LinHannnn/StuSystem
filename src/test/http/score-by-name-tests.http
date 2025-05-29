@@ -1,0 +1,19 @@
+### 根据学生姓名获取成绩
+GET http://localhost:8080/api/scores/student/name/张三
+Content-Type: application/json
+Accept: application/json
+
+### 根据学生姓名和学期获取成绩
+GET http://localhost:8080/api/scores/student/name/张三/semester/2023-2024-1
+Content-Type: application/json
+Accept: application/json
+
+### 测试模糊匹配 - 根据部分姓名查询
+GET http://localhost:8080/api/scores/student/name/张
+Content-Type: application/json
+Accept: application/json
+
+### 测试不存在的学生姓名
+GET http://localhost:8080/api/scores/student/name/不存在的学生
+Content-Type: application/json
+Accept: application/json 

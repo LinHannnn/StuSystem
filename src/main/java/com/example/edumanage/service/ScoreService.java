@@ -32,11 +32,17 @@ public interface ScoreService {
     // 根据学生ID获取成绩
     List<ScoreDTO> getScoresByStudentId(Long studentId);
     
+    // 根据学生姓名获取成绩
+    List<ScoreDTO> getScoresByStudentName(String studentName);
+    
     // 根据学期获取所有成绩
     List<ScoreDTO> getScoresBySemester(String semester);
     
     // 根据学生ID和学期获取成绩
     List<ScoreDTO> getScoresByStudentIdAndSemester(Long studentId, String semester);
+    
+    // 根据学生姓名和学期获取成绩
+    List<ScoreDTO> getScoresByStudentNameAndSemester(String studentName, String semester);
     
     // 获取学生在某学期的平均成绩
     Double getStudentAverageScoreBySemester(Long studentId, String semester);

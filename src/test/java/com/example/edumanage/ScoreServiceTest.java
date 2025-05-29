@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -229,5 +230,85 @@ public class ScoreServiceTest {
         
         // 验证交互
         verify(scoreRepository).getStudentAverageScoreBySemester(1L, "2025-SPRING");
+    }
+    
+    @Test
+    void testGetScoresByStudentName() {
+        // 准备测试数据
+        Student student = new Student();
+        student.setId(1L);
+        student.setStudentName("张三");
+        
+        Score score1 = new Score();
+        score1.setId(1L);
+        score1.setStudent(student);
+        score1.setStatus(1);
+        
+        Score score2 = new Score();
+        score2.setId(2L);
+        score2.setStudent(student);
+        score2.setStatus(1);
+        
+        List<Student> students = Collections.singletonList(student);
+        List<Score> scores = Arrays.asList(score1, score2);
+        
+        // 模拟行为
+        when(studentRepository.findByStudentNameContaining("张三")).thenReturn(students);
+        when(scoreRepository.findByStudentIdAndStatusOrderBySemesterDesc(1L, 1)).thenReturn(scores);
+        when(scoreConverter.toDTOList(scores)).thenReturn(Arrays.asList(new ScoreDTO(), new ScoreDTO()));
+        
+        // 执行测试
+        List<ScoreDTO> result = scoreService.getScoresByStudentName("张三");
+        
+        // 验证结果
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(studentRepository).findByStudentNameContaining("张三");
+        verify(scoreRepository).findByStudentIdAndStatusOrderBySemesterDesc(1L, 1);
+    }
+    
+    @Test
+    void testGetScoresByStudentName_StudentNotFound() {
+        // 模拟行为
+        when(studentRepository.findByStudentNameContaining("不存在的学生")).thenReturn(Collections.emptyList());
+        
+        // 执行测试并验证异常
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            scoreService.getScoresByStudentName("不存在的学生");
+        });
+        
+        // 验证异常消息
+        assertTrue(exception.getMessage().contains("未找到姓名包含"));
+    }
+    
+    @Test
+    void testGetScoresByStudentNameAndSemester() {
+        // 准备测试数据
+        Student student = new Student();
+        student.setId(1L);
+        student.setStudentName("张三");
+        
+        Score score1 = new Score();
+        score1.setId(1L);
+        score1.setStudent(student);
+        score1.setSemester("2023-2024-1");
+        score1.setStatus(1);
+        
+        List<Student> students = Collections.singletonList(student);
+        List<Score> scores = Collections.singletonList(score1);
+        
+        // 模拟行为
+        when(studentRepository.findByStudentNameContaining("张三")).thenReturn(students);
+        when(scoreRepository.findByStudentIdAndSemesterAndStatusOrderByCourseIdAsc(1L, "2023-2024-1", 1)).thenReturn(scores);
+        when(scoreConverter.toDTOList(scores)).thenReturn(Collections.singletonList(new ScoreDTO()));
+        
+        // 执行测试
+        List<ScoreDTO> result = scoreService.getScoresByStudentNameAndSemester("张三", "2023-2024-1");
+        
+        // 验证结果
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(studentRepository).findByStudentNameContaining("张三");
+        verify(scoreRepository).findByStudentIdAndSemesterAndStatusOrderByCourseIdAsc(1L, "2023-2024-1", 1);
     }
 } 

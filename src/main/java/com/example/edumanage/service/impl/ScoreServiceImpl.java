@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -152,6 +153,24 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
+    public List<ScoreDTO> getScoresByStudentName(String studentName) {
+        // 根据学生姓名查找学生
+        List<Student> students = studentRepository.findByStudentNameContaining(studentName);
+        if (students.isEmpty()) {
+            throw new ResourceNotFoundException("未找到姓名包含 '" + studentName + "' 的学生");
+        }
+        
+        // 获取所有匹配学生的成绩
+        List<Score> allScores = new ArrayList<>();
+        for (Student student : students) {
+            List<Score> studentScores = scoreRepository.findByStudentIdAndStatusOrderBySemesterDesc(student.getId(), 1);
+            allScores.addAll(studentScores);
+        }
+        
+        return scoreConverter.toDTOList(allScores);
+    }
+
+    @Override
     public List<ScoreDTO> getScoresBySemester(String semester) {
         List<Score> scores = scoreRepository.findBySemesterAndStatusOrderByStudentIdAsc(semester, 1);
         return scoreConverter.toDTOList(scores);
@@ -166,6 +185,25 @@ public class ScoreServiceImpl implements ScoreService {
         
         List<Score> scores = scoreRepository.findByStudentIdAndSemesterAndStatusOrderByCourseIdAsc(studentId, semester, 1);
         return scoreConverter.toDTOList(scores);
+    }
+
+    @Override
+    public List<ScoreDTO> getScoresByStudentNameAndSemester(String studentName, String semester) {
+        // 根据学生姓名查找学生
+        List<Student> students = studentRepository.findByStudentNameContaining(studentName);
+        if (students.isEmpty()) {
+            throw new ResourceNotFoundException("未找到姓名包含 '" + studentName + "' 的学生");
+        }
+        
+        // 获取所有匹配学生在指定学期的成绩
+        List<Score> allScores = new ArrayList<>();
+        for (Student student : students) {
+            List<Score> studentScores = scoreRepository.findByStudentIdAndSemesterAndStatusOrderByCourseIdAsc(
+                    student.getId(), semester, 1);
+            allScores.addAll(studentScores);
+        }
+        
+        return scoreConverter.toDTOList(allScores);
     }
 
     @Override
