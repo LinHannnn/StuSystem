@@ -1,0 +1,109 @@
+### 获取所有成绩
+GET http://localhost:8080/api/scores
+Accept: application/json
+
+### 创建新成绩
+POST http://localhost:8080/api/scores
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "examType": "FINAL",
+  "score": 85.5,
+  "semester": "2025-SPRING"
+}
+
+### 创建新成绩（不及格）
+POST http://localhost:8080/api/scores
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 2,
+  "examType": "FINAL",
+  "score": 55,
+  "semester": "2025-SPRING"
+}
+
+### 更新成绩
+PUT http://localhost:8080/api/scores/1
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "examType": "FINAL",
+  "score": 92,
+  "semester": "2025-SPRING"
+}
+
+### 获取特定成绩
+GET http://localhost:8080/api/scores/1
+Accept: application/json
+
+### 获取学生所有成绩
+GET http://localhost:8080/api/scores/student/1
+Accept: application/json
+
+### 获取特定学期所有成绩
+GET http://localhost:8080/api/scores/semester/2025-SPRING
+Accept: application/json
+
+### 获取学生在特定学期的成绩
+GET http://localhost:8080/api/scores/student/1/semester/2025-SPRING
+Accept: application/json
+
+### 获取学生在特定学期的平均成绩
+GET http://localhost:8080/api/scores/student/1/semester/2025-SPRING/average
+Accept: application/json
+
+### 获取课程在特定学期的平均成绩
+GET http://localhost:8080/api/scores/course/1/semester/2025-SPRING/average
+Accept: application/json
+
+### 删除成绩
+DELETE http://localhost:8080/api/scores/1
+Accept: application/json
+
+### 批量删除成绩
+DELETE http://localhost:8080/api/scores/batch
+Content-Type: application/json
+
+[1, 2, 3]
+
+### 无效请求测试 - 分数超出范围
+POST http://localhost:8080/api/scores
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "examType": "FINAL",
+  "score": 101,
+  "semester": "2025-SPRING"
+}
+
+### 无效请求测试 - 考试类型无效
+POST http://localhost:8080/api/scores
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "examType": "INVALID",
+  "score": 80,
+  "semester": "2025-SPRING"
+}
+
+### 无效请求测试 - 学期格式无效
+POST http://localhost:8080/api/scores
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "courseId": 1,
+  "examType": "FINAL",
+  "score": 80,
+  "semester": "2025-INVALID"
+} 
