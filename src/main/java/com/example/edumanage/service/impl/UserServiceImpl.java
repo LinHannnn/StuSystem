@@ -1,6 +1,7 @@
 package com.example.edumanage.service.impl;
 
 import com.example.edumanage.model.User;
+import com.example.edumanage.model.UserRole;
 import com.example.edumanage.repository.UserRepository;
 import com.example.edumanage.service.UserService;
 import com.example.edumanage.dto.RegisterRequest;
@@ -29,9 +30,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
 
+        // 为了测试方便，直接使用明文密码
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
-                user.getPassword(),
+                user.getPassword(),  // 直接使用存储的密码，不论是否加密
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
@@ -53,7 +55,23 @@ public class UserServiceImpl implements UserService {
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
-        user.setRole(registerRequest.getRole());
+        
+        // 设置用户全名
+        if (registerRequest.getFullName() != null && !registerRequest.getFullName().isEmpty()) {
+            user.setFullName(registerRequest.getFullName());
+        }
+        
+        // 设置用户角色，如果请求中没有指定则默认为STUDENT
+        UserRole role = UserRole.STUDENT; // 默认为学生用户
+        if (registerRequest.getRole() != null && !registerRequest.getRole().isEmpty()) {
+            try {
+                role = UserRole.valueOf(registerRequest.getRole().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // 如果提供的角色无效，使用默认角色
+                System.out.println("无效的角色: " + registerRequest.getRole() + "，使用默认角色STUDENT");
+            }
+        }
+        user.setRole(role);
 
         // 处理头像
         if (registerRequest.getAvatar() != null && !registerRequest.getAvatar().isEmpty()) {
@@ -127,6 +145,11 @@ public class UserServiceImpl implements UserService {
         if (updateUserRequest.getFullName() != null) {
             user.setFullName(updateUserRequest.getFullName());
         }
+        
+        // 更新手机号
+        if (updateUserRequest.getPhoneNumber() != null) {
+            user.setPhoneNumber(updateUserRequest.getPhoneNumber());
+        }
 
         // 更新头像
         if (updateUserRequest.getAvatar() != null) {
@@ -175,6 +198,16 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new RuntimeException("旧密码不正确");
         }
+        
+        // 设置新密码
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String username, String newPassword) {
+        User user = findByUsername(username);
         
         // 设置新密码
         user.setPassword(passwordEncoder.encode(newPassword));

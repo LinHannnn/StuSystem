@@ -1,0 +1,2849 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "教育管理系统API",
+    "description": "简洁版API文档 - 包含基础CRUD、批量删除和模糊查询",
+    "version": "1.0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "本地服务器"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "newusername"
+          },
+          "email": {
+            "type": "string",
+            "example": "newemail@example.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "新名字"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "byte",
+            "description": "Base64编码的用户头像",
+            "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "13900001111"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "newuser"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "张三"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "byte",
+            "description": "Base64编码的用户头像",
+            "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "TEACHER", "STUDENT"],
+            "description": "用户角色",
+            "example": "STUDENT"
+          }
+        },
+        "required": ["username", "password", "email"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          }
+        },
+        "required": ["username", "password"]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "example": "oldpassword"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newpassword"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "example": "newpassword"
+          }
+        },
+        "required": ["oldPassword", "newPassword", "confirmPassword"]
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "user1"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newpassword"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "example": "newpassword"
+          }
+        },
+        "required": ["username", "newPassword", "confirmPassword"]
+      },
+      "ProjectDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "projectName": {
+            "type": "string",
+            "example": "软件开发项目"
+          },
+          "description": {
+            "type": "string",
+            "example": "开发一个在线教育平台"
+          },
+          "teamId": {
+            "type": "string",
+            "example": "TEAM001"
+          },
+          "managerId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "weekDay": {
+            "type": "integer",
+            "description": "星期几(1-7)，表示例行会议日",
+            "example": 2
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time",
+            "description": "会议开始时间",
+            "example": "09:30:00"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time",
+            "description": "会议结束时间",
+            "example": "10:30:00"
+          }
+        }
+      },
+      "TeamDTO": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "example": "TEAM001"
+          },
+          "teamName": {
+            "type": "string",
+            "example": "研发团队"
+          },
+          "division": {
+            "type": "string",
+            "example": "技术部"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "location": {
+            "type": "string",
+            "example": "北京"
+          },
+          "teamLeaderId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      },
+      "StaffMemberDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "staffId": {
+            "type": "string",
+            "example": "EMP001"
+          },
+          "staffName": {
+            "type": "string",
+            "example": "张三"
+          },
+          "gender": {
+            "type": "integer",
+            "example": 1
+          },
+          "age": {
+            "type": "integer",
+            "example": 30
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "13800138000"
+          },
+          "teamId": {
+            "type": "string",
+            "example": "TEAM001"
+          }
+        }
+      },
+      "PerformanceDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "staffId": {
+            "type": "string",
+            "example": "EMP001"
+          },
+          "projectId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "quarter": {
+            "type": "string",
+            "example": "2023-Q1"
+          },
+          "score": {
+            "type": "number",
+            "format": "double",
+            "example": 90.5
+          }
+        }
+      },
+      "DepartmentRequest": {
+        "type": "object",
+        "properties": {
+          "departmentName": {
+            "type": "string",
+            "example": "技术研发部"
+          }
+        },
+        "required": ["departmentName"]
+      },
+      "DepartmentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "departmentName": {
+            "type": "string",
+            "example": "技术研发部"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "用户注册",
+        "description": "注册新用户，支持上传头像。注意：当前实现已修复，用户角色默认为STUDENT，也可以根据前端传递的role字段确定用户角色。",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "example": {
+                "username": "newuser",
+                "password": "password123",
+                "email": "user@example.com",
+                "fullName": "张三",
+                "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+                "role": "STUDENT"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "username": "newuser",
+                    "email": "user@example.com",
+                    "fullName": "张三",
+                    "avatarUrl": "/api/avatars/newuser.png"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 用户名已存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "用户登录",
+        "description": "获取JWT令牌",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "username": "admin",
+                "password": "password"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiJ9...",
+                    "username": "admin",
+                    "role": "ADMIN",
+                    "email": "admin@example.com",
+                    "fullName": "管理员"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "认证失败",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "用户名或密码错误",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": ["项目管理"],
+        "summary": "获取所有项目",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "content": [
+                      {
+                        "id": 1,
+                        "projectName": "在线教育平台开发",
+                        "description": "开发一个支持多端的在线教育系统",
+                        "teamId": "TEAM001",
+                        "managerId": 1
+                      },
+                      {
+                        "id": 2,
+                        "projectName": "移动应用开发",
+                        "description": "开发iOS和Android应用",
+                        "teamId": "TEAM002",
+                        "managerId": 2
+                      }
+                    ],
+                    "pageable": {
+                      "pageNumber": 0,
+                      "pageSize": 10,
+                      "totalElements": 2,
+                      "totalPages": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["项目管理"],
+        "summary": "创建项目",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectDTO"
+              },
+              "example": {
+                "projectName": "数据分析系统",
+                "description": "开发一个大数据分析系统",
+                "teamId": "TEAM003",
+                "managerId": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 3,
+                    "projectName": "数据分析系统",
+                    "description": "开发一个大数据分析系统",
+                    "teamId": "TEAM003",
+                    "managerId": 3
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 项目名称不能为空",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "tags": ["项目管理"],
+        "summary": "根据ID获取项目",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "projectName": "在线教育平台开发",
+                    "description": "开发一个支持多端的在线教育系统",
+                    "teamId": "TEAM001",
+                    "managerId": 1
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "项目不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["项目管理"],
+        "summary": "更新项目",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectDTO"
+              },
+              "example": {
+                "projectName": "在线教育平台开发(升级版)",
+                "description": "开发一个支持多端、多语言的在线教育系统",
+                "teamId": "TEAM001",
+                "managerId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "projectName": "在线教育平台开发(升级版)",
+                    "description": "开发一个支持多端、多语言的在线教育系统",
+                    "teamId": "TEAM001",
+                    "managerId": 1
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "项目不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["项目管理"],
+        "summary": "删除项目",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "项目不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/search": {
+      "get": {
+        "tags": ["项目管理"],
+        "summary": "搜索项目",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "教育"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "projectName": "在线教育平台开发",
+                      "description": "开发一个支持多端的在线教育系统",
+                      "teamId": "TEAM001",
+                      "managerId": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/batch": {
+      "delete": {
+        "tags": ["项目管理"],
+        "summary": "批量删除项目",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              },
+              "example": [1, 2, 3]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams": {
+      "get": {
+        "tags": ["团队管理"],
+        "summary": "获取所有团队",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "teamId": "TEAM001",
+                      "teamName": "研发团队",
+                      "division": "技术部",
+                      "status": "active",
+                      "location": "北京",
+                      "teamLeaderId": 1
+                    },
+                    {
+                      "teamId": "TEAM002",
+                      "teamName": "测试团队",
+                      "division": "质量部",
+                      "status": "active",
+                      "location": "上海",
+                      "teamLeaderId": 2
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["团队管理"],
+        "summary": "创建团队",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              },
+              "example": {
+                "teamId": "TEAM003",
+                "teamName": "产品团队",
+                "division": "产品部",
+                "status": "active",
+                "location": "广州",
+                "teamLeaderId": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "teamId": "TEAM003",
+                    "teamName": "产品团队",
+                    "division": "产品部",
+                    "status": "active",
+                    "location": "广州",
+                    "teamLeaderId": 3
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 团队名称不能为空",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams/{teamId}": {
+      "get": {
+        "tags": ["团队管理"],
+        "summary": "根据ID获取团队",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TEAM001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "teamId": "TEAM001",
+                    "teamName": "研发团队",
+                    "division": "技术部",
+                    "status": "active",
+                    "location": "北京",
+                    "teamLeaderId": 1
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "团队不存在，ID: TEAM999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["团队管理"],
+        "summary": "更新团队",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TEAM001"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              },
+              "example": {
+                "teamName": "研发核心团队",
+                "division": "技术部",
+                "status": "active",
+                "location": "北京",
+                "teamLeaderId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "teamId": "TEAM001",
+                    "teamName": "研发核心团队",
+                    "division": "技术部",
+                    "status": "active",
+                    "location": "北京",
+                    "teamLeaderId": 1
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "团队不存在，ID: TEAM999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["团队管理"],
+        "summary": "删除团队",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TEAM001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "团队不存在，ID: TEAM999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams/find": {
+      "get": {
+        "tags": ["团队管理"],
+        "summary": "搜索团队",
+        "description": "注意：原/api/teams/search接口已重定向到此接口",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "研发"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "teamId": "TEAM001",
+                      "teamName": "研发团队",
+                      "division": "技术部",
+                      "status": "active",
+                      "location": "北京",
+                      "teamLeaderId": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams/search": {
+      "get": {
+        "tags": ["团队管理"],
+        "summary": "搜索团队(已重定向)",
+        "description": "此接口已重定向到/api/teams/find，保留此接口是为了向后兼容",
+        "deprecated": true,
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "研发"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "重定向到/api/teams/find接口"
+          }
+        }
+      }
+    },
+    "/api/teams/batch": {
+      "delete": {
+        "tags": ["团队管理"],
+        "summary": "批量删除团队",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "example": ["TEAM001", "TEAM002"]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff-members": {
+      "get": {
+        "tags": ["员工管理"],
+        "summary": "获取所有员工",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "staffName": "张三",
+                      "gender": 1,
+                      "age": 30,
+                      "phoneNumber": "13800138000",
+                      "teamId": "TEAM001"
+                    },
+                    {
+                      "id": 2,
+                      "staffId": "EMP002",
+                      "staffName": "李四",
+                      "gender": 1,
+                      "age": 28,
+                      "phoneNumber": "13900139000",
+                      "teamId": "TEAM002"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["员工管理"],
+        "summary": "创建员工",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffMemberDTO"
+              },
+              "example": {
+                "staffId": "EMP003",
+                "staffName": "王五",
+                "gender": 1,
+                "age": 32,
+                "phoneNumber": "13700137000",
+                "teamId": "TEAM001"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 3,
+                    "staffId": "EMP003",
+                    "staffName": "王五",
+                    "gender": 1,
+                    "age": 32,
+                    "phoneNumber": "13700137000",
+                    "teamId": "TEAM001"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 员工工号不能为空",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff-members/{id}": {
+      "get": {
+        "tags": ["员工管理"],
+        "summary": "根据ID获取员工",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "staffId": "EMP001",
+                    "staffName": "张三",
+                    "gender": 1,
+                    "age": 30,
+                    "phoneNumber": "13800138000",
+                    "teamId": "TEAM001"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "员工不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["员工管理"],
+        "summary": "更新员工",
+        "description": "更新员工信息，所有字段均为可选",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffMemberDTO"
+              },
+              "example": {
+                "staffId": "EMP001",
+                "staffName": "张三(修改)",
+                "gender": 1,
+                "age": 31,
+                "phoneNumber": "13800138001",
+                "teamId": "TEAM002"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "staffId": "EMP001",
+                    "staffName": "张三(修改)",
+                    "gender": 1,
+                    "age": 31,
+                    "phoneNumber": "13800138001",
+                    "teamId": "TEAM002"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "员工不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["员工管理"],
+        "summary": "删除员工",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "员工不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff-members/search": {
+      "get": {
+        "tags": ["员工管理"],
+        "summary": "搜索员工",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "张"
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "TEAM001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "staffName": "张三",
+                      "gender": 1,
+                      "age": 30,
+                      "phoneNumber": "13800138000",
+                      "teamId": "TEAM001"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff-members/batch": {
+      "delete": {
+        "tags": ["员工管理"],
+        "summary": "批量删除员工",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              },
+              "example": [1, 2, 3]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "获取所有绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "content": [
+                      {
+                        "id": 1,
+                        "staffId": "EMP001",
+                        "projectId": 1,
+                        "quarter": "2023-Q1",
+                        "score": 92.5
+                      },
+                      {
+                        "id": 2,
+                        "staffId": "EMP002",
+                        "projectId": 1,
+                        "quarter": "2023-Q1",
+                        "score": 88.0
+                      }
+                    ],
+                    "pageable": {
+                      "pageNumber": 0,
+                      "pageSize": 10,
+                      "totalElements": 2,
+                      "totalPages": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["绩效管理"],
+        "summary": "创建绩效",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceDTO"
+              },
+              "example": {
+                "staffId": "EMP003",
+                "projectId": 2,
+                "quarter": "2023-Q1",
+                "score": 95.0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 3,
+                    "staffId": "EMP003",
+                    "projectId": 2,
+                    "quarter": "2023-Q1",
+                    "score": 95.0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 员工ID不能为空",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/{id}": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "根据ID获取绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "staffId": "EMP001",
+                    "projectId": 1,
+                    "quarter": "2023-Q1",
+                    "score": 92.5
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "绩效记录不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["绩效管理"],
+        "summary": "更新绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceDTO"
+              },
+              "example": {
+                "staffId": "EMP001",
+                "projectId": 1,
+                "quarter": "2023-Q1",
+                "score": 95.0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "staffId": "EMP001",
+                    "projectId": 1,
+                    "quarter": "2023-Q1",
+                    "score": 95.0
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "绩效记录不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["绩效管理"],
+        "summary": "删除绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "绩效记录不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/search": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "搜索绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "staffId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "EMP001"
+          },
+          {
+            "name": "quarter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2023-Q1"
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "evaluationType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ANNUAL", "QUARTERLY", "MONTHLY"]
+            },
+            "example": "QUARTERLY",
+            "description": "评估类型：ANNUAL（年度评估）、QUARTERLY（季度评估）、MONTHLY（月度评估）"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "projectId": 1,
+                      "quarter": "2023-Q1",
+                      "score": 92.5,
+                      "evaluationType": "QUARTERLY"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/batch": {
+      "delete": {
+        "tags": ["绩效管理"],
+        "summary": "批量删除绩效",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              },
+              "example": [1, 2, 3]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/evaluation-type/{evaluationType}": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "根据评估类型获取绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "evaluationType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["ANNUAL", "QUARTERLY", "MONTHLY"]
+            },
+            "example": "QUARTERLY",
+            "description": "评估类型：ANNUAL（年度评估）、QUARTERLY（季度评估）、MONTHLY（月度评估）"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "projectId": 1,
+                      "quarter": "2023-Q1",
+                      "score": 92.5,
+                      "evaluationType": "QUARTERLY"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/staff/{staffId}/evaluation-type/{evaluationType}": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "根据员工工号和评估类型获取绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "staffId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "EMP001"
+          },
+          {
+            "name": "evaluationType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["ANNUAL", "QUARTERLY", "MONTHLY"]
+            },
+            "example": "QUARTERLY",
+            "description": "评估类型：ANNUAL（年度评估）、QUARTERLY（季度评估）、MONTHLY（月度评估）"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "projectId": 1,
+                      "quarter": "2023-Q1",
+                      "score": 92.5,
+                      "evaluationType": "QUARTERLY"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performances/quarter/{quarter}/evaluation-type/{evaluationType}": {
+      "get": {
+        "tags": ["绩效管理"],
+        "summary": "根据季度和评估类型获取绩效",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "quarter",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2023-Q1"
+          },
+          {
+            "name": "evaluationType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["ANNUAL", "QUARTERLY", "MONTHLY"]
+            },
+            "example": "QUARTERLY",
+            "description": "评估类型：ANNUAL（年度评估）、QUARTERLY（季度评估）、MONTHLY（月度评估）"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "staffId": "EMP001",
+                      "projectId": 1,
+                      "quarter": "2023-Q1",
+                      "score": 92.5,
+                      "evaluationType": "QUARTERLY"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/profile": {
+      "get": {
+        "tags": ["用户管理"],
+        "summary": "获取当前用户信息",
+        "description": "获取当前登录用户的详细信息",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "username": "admin",
+                    "email": "admin@example.com",
+                    "fullName": "管理员",
+                    "avatarUrl": "/api/avatars/admin.png",
+                    "phoneNumber": "13800138000",
+                    "role": "ADMIN"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["用户管理"],
+        "summary": "更新用户信息",
+        "description": "更新当前登录用户的信息，所有字段均为可选",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              },
+              "example": {
+                "username": "admin2",
+                "email": "admin2@example.com",
+                "fullName": "管理员(已更新)",
+                "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+                "phoneNumber": "13900001111"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "username": "admin2",
+                    "email": "admin2@example.com",
+                    "fullName": "管理员(已更新)",
+                    "avatarUrl": "/api/avatars/admin2.png",
+                    "phoneNumber": "13900001111",
+                    "role": "ADMIN"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 用户名已存在",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/reset-password": {
+      "post": {
+        "tags": ["用户管理"],
+        "summary": "用户重置密码",
+        "description": "用户重置自己的密码，需要提供旧密码进行验证",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              },
+              "example": {
+                "oldPassword": "oldpassword123",
+                "newPassword": "newpassword123",
+                "confirmPassword": "newpassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码重置成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 两次输入的密码不一致",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权或旧密码不正确",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "旧密码不正确",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/change-password": {
+      "post": {
+        "tags": ["用户管理"],
+        "summary": "管理员修改用户密码",
+        "description": "管理员可以直接修改任意用户的密码，无需验证原密码",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              },
+              "example": {
+                "username": "user1",
+                "newPassword": "newpassword123",
+                "confirmPassword": "newpassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码修改成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 两次输入的密码不一致",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "没有权限",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "权限不足，需要管理员权限",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "用户不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "用户不存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments": {
+      "post": {
+        "tags": ["部门管理"],
+        "summary": "创建部门",
+        "description": "创建新部门，需要ADMIN或HR角色权限",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentRequest"
+              },
+              "example": {
+                "departmentName": "技术研发部"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "departmentName": "技术研发部"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 部门名称已存在",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "权限不足，需要ADMIN或HR角色",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "获取所有部门",
+        "description": "获取所有部门列表，需要登录认证",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "departmentName": "技术研发部"
+                    },
+                    {
+                      "id": 2,
+                      "departmentName": "市场营销部"
+                    },
+                    {
+                      "id": 3,
+                      "departmentName": "人力资源部"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/search": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "搜索部门",
+        "description": "根据部门名称搜索部门，支持精确和模糊查询",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "departmentName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "技术",
+            "description": "部门名称关键词"
+          },
+          {
+            "name": "exact",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "example": false,
+            "description": "是否精确匹配，默认为false（模糊匹配）"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "departmentName": "技术研发部"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/{id}": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "根据ID获取部门",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "departmentName": "技术研发部"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["部门管理"],
+        "summary": "更新部门",
+        "description": "更新部门信息，需要ADMIN或HR角色权限",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentRequest"
+              },
+              "example": {
+                "departmentName": "技术研发中心"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "departmentName": "技术研发中心"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "请求参数错误: 部门名称已存在",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "权限不足，需要ADMIN或HR角色",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["部门管理"],
+        "summary": "删除部门",
+        "description": "删除部门，需要ADMIN角色权限，且部门下不能有员工",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "删除部门失败：部门下还有员工，无法删除",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "权限不足，需要ADMIN角色",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在，ID: 999",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/name/{departmentName}": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "根据部门名称获取部门",
+        "description": "根据部门名称获取部门信息，支持精确和模糊查询",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "departmentName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "技术研发部"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": {
+                    "id": 1,
+                    "departmentName": "技术研发部"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在：财务部",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/{id}/employees": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "获取部门员工列表",
+        "description": "获取指定部门的员工列表，需要ADMIN、HR角色或部门内员工权限",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "employeeId": "E001",
+                    "name": "张三",
+                    "position": "开发工程师",
+                    "email": "zhangsan@example.com",
+                    "phoneNumber": "13800138001",
+                    "departmentId": 1
+                  },
+                  {
+                    "id": 2,
+                    "employeeId": "E002",
+                    "name": "李四",
+                    "position": "测试工程师",
+                    "email": "lisi@example.com",
+                    "phoneNumber": "13800138002",
+                    "departmentId": 1
+                  }
+                ]
+              }
+            }
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "权限不足，需要ADMIN、HR角色或是部门员工",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/{id}/employees/count": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "获取部门员工数量",
+        "description": "获取指定部门的员工数量，需要登录认证",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "count": 2
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未授权",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 401,
+                  "message": "需要身份验证",
+                  "data": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 404,
+                  "message": "部门不存在",
+                  "data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dpt/departments/exists/{id}": {
+      "get": {
+        "tags": ["部门管理"],
+        "summary": "检查部门是否存在",
+        "description": "根据ID检查部门是否存在",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "操作成功",
+                  "data": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

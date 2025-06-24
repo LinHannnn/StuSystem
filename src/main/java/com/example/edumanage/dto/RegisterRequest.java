@@ -2,10 +2,8 @@ package com.example.edumanage.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import com.example.edumanage.model.UserRole;
 
 @Data
 public class RegisterRequest {
@@ -21,8 +19,9 @@ public class RegisterRequest {
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    @NotNull(message = "用户角色不能为空")
-    private UserRole role;
-
     private String avatar; // Base64格式的头像数据
+    
+    private String role; // 用户角色
+    
+    private String fullName; // 用户全名
 } 
